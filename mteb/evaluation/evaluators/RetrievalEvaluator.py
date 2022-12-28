@@ -39,9 +39,11 @@ class RetrievalEvaluator(Evaluator):
         },  # Score function, higher=more similar
         main_score_function: str = None,
         limit: int = None,
+        rank: int = 0,
         **kwargs
     ):
         super().__init__(**kwargs)
+        self.rank = rank
         self.queries_ids = []
         for qid in queries:
             if qid in relevant_docs and len(relevant_docs[qid]) > 0:
@@ -128,10 +130,11 @@ class RetrievalEvaluator(Evaluator):
                 corpus_end_idx = min(corpus_start_idx + self.corpus_chunk_size, len(corpus_embeddings))
                 sub_corpus_embeddings = corpus_embeddings[corpus_start_idx:corpus_end_idx]
 
+            if self.rank != 0: return {}
+            
             # Compute cosine similarites
             for name, score_function in self.score_functions.items():
                 pair_scores = score_function(query_embeddings, sub_corpus_embeddings)
-
                 # Get top-k values
                 pair_scores_top_k_values, pair_scores_top_k_idx = torch.topk(
                     pair_scores,
@@ -154,8 +157,8 @@ class RetrievalEvaluator(Evaluator):
         # Compute scores
         logger.info("Computing metrics...")
         scores = {name: self._compute_metrics(queries_result_list[name]) for name in self.score_functions}
-
         return scores
+
 
     def _compute_metrics(self, queries_result_list: List[object]):
         """
