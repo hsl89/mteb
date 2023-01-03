@@ -2,9 +2,11 @@ import os
 import datasets
 import time
 from loguru import logger
+import sys
 
 from .AbsTask import AbsTask
 
+logger.add(sys.stdout)
 
 class BeIRTask(AbsTask):
     def __init__(self, **kwargs):
@@ -49,7 +51,7 @@ class BeIRTask(AbsTask):
                 download_path = os.path.join(datasets.config.HF_DATASETS_CACHE, "BeIR")
                 data_path = util.download_and_unzip(url, download_path)
                 data_path = f"{data_path}/{sub_dataset}" if sub_dataset else data_path
-                patience = 10
+                patience = 3600
                 wait_time = 0
                 while set(os.listdir(data_path)) != set(["queries.jsonl", "corpus.jsonl", "qrels"]):
                     if wait_time > patience:
@@ -57,6 +59,7 @@ class BeIRTask(AbsTask):
                             "Cannot find all unzipped files after %s seconds, files under %s are %s"
                             % (patience, data_path, str(os.listdir(data_path)))
                         )
+                    logger.info("Files under %s after waiting %s seconds: %s" % (data_path, wait_time, os.listdir(data_path)))
                     time.sleep(1)
                     wait_time += 1
                 self.corpus[split], self.queries[split], self.relevant_docs[split] = BeirDataLoader(
