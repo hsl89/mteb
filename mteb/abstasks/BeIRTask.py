@@ -1,5 +1,7 @@
 import os
 import datasets
+import time
+from loguru import logger
 
 from .AbsTask import AbsTask
 
@@ -20,7 +22,7 @@ class BeIRTask(AbsTask):
         USE_BEIR_DEVELOPMENT = False
         try:
             raise ImportError("MTEB is temporarily incompatible with HFDataLoader")
-                              
+
             if self.description["beir_name"].startswith("cqadupstack"):
                 raise ImportError("CQADupstack is incompatible with latest BEIR")
             from beir.datasets.data_loader_hf import HFDataLoader as BeirDataLoader
@@ -47,6 +49,16 @@ class BeIRTask(AbsTask):
                 download_path = os.path.join(datasets.config.HF_DATASETS_CACHE, "BeIR")
                 data_path = util.download_and_unzip(url, download_path)
                 data_path = f"{data_path}/{sub_dataset}" if sub_dataset else data_path
+                patience = 10
+                wait_time = 0
+                while set(os.listdir(data_path)) != set(["queries.jsonl", "corpus.jsonl", "qrels"]):
+                    if wait_time > patience:
+                        raise RuntimeError(
+                            "Cannot find all unzipped files after %s seconds, files under %s are %s"
+                            % (patience, data_path, str(os.listdir(data_path)))
+                        )
+                    time.sleep(1)
+                    wait_time += 1
                 self.corpus[split], self.queries[split], self.relevant_docs[split] = BeirDataLoader(
                     data_folder=data_path
                 ).load(split=split)

@@ -4,11 +4,13 @@ import random
 import numpy as np
 import torch
 
+
 class Evaluator(ABC):
     """
     Base class for all evaluators
     Extend this class and implement __call__ for custom evaluators.
     """
+
     def __init__(self, seed=42, **kwargs):
         self.seed = seed
         random.seed(self.seed)

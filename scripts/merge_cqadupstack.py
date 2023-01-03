@@ -43,7 +43,7 @@ logger.info("Found CQADupstack files: ", files)
 if len(files) == len(TASK_LIST_CQA):
     all_results = {}
     for file_name in files:
-        with open(file_name, 'r', encoding='utf-8') as f:
+        with open(file_name, "r", encoding="utf-8") as f:
             results = json.load(f)
             for split, split_results in results.items():
                 if split not in ("train", "validation", "dev", "test"):
@@ -55,11 +55,11 @@ if len(files) == len(TASK_LIST_CQA):
                     if metric == "evaluation_time":
                         score = all_results[split][metric] + score
                     elif metric not in NOAVG_KEYS:
-                        score = all_results[split][metric] + score * 1/len(TASK_LIST_CQA)
+                        score = all_results[split][metric] + score * 1 / len(TASK_LIST_CQA)
                     all_results[split][metric] = score
 
     logger.info("Saving ", all_results)
-    with open(os.path.join(results_folder, "CQADupstackRetrieval.json"), 'w', encoding='utf-8') as f:
+    with open(os.path.join(results_folder, "CQADupstackRetrieval.json"), "w", encoding="utf-8") as f:
         json.dump(all_results, f, indent=4)
 else:
     logger.warning(f"Missing files {set(TASK_LIST_CQA) - set(files)} or got too many files.")
