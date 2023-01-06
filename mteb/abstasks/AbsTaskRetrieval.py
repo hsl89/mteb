@@ -45,6 +45,7 @@ class AbsTaskRetrieval(AbsTask):
     def evaluate(
         self,
         model,
+        rank, 
         split="test",
         batch_size=128,
         corpus_chunk_size=None,
@@ -102,6 +103,8 @@ class AbsTaskRetrieval(AbsTask):
         end_time = time()
         print("Time taken to retrieve: {:.2f} seconds".format(end_time - start_time))
 
+        if rank != 0: return {}
+        
         ndcg, _map, recall, precision = retriever.evaluate(relevant_docs, results, retriever.k_values)
         mrr = retriever.evaluate_custom(relevant_docs, results, retriever.k_values, "mrr")
 
