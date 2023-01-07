@@ -89,12 +89,13 @@ class EvaluateRetrieval:
             # recall[f"Recall@{k}"] = 0.0
             # precision[f"P@{k}"] = 0.0
         
-        map_string = "map_cut." + ",".join([str(k) for k in k_values])
-        # ndcg_string = "ndcg_cut." + ",".join([str(k) for k in k_values])
+        ndcg_string = "ndcg_cut." + ",".join([str(k) for k in k_values])
+
+        # map_string = "map_cut." + ",".join([str(k) for k in k_values])
         # recall_string = "recall." + ",".join([str(k) for k in k_values])
         # precision_string = "P." + ",".join([str(k) for k in k_values])
         # evaluator = pytrec_eval.RelevanceEvaluator(qrels, {map_string, ndcg_string, recall_string, precision_string})
-        evaluator = pytrec_eval.RelevanceEvaluator(qrels, {map_string})
+        evaluator = pytrec_eval.RelevanceEvaluator(qrels, {ndcg_string})
         scores = evaluator.evaluate(results)
         
         for query_id in scores.keys():
@@ -213,7 +214,7 @@ class AbsTaskRetrieval(AbsTask):
             **kwargs,
         )
 
-        retriever = EvaluateRetrieval(model, score_function=score_function)  # or "cos_sim" or "dot"
+        retriever = EvaluateRetrieval(model, score_function=score_function, k_values=[10])  # or "cos_sim" or "dot"
         start_time = time()
         results = retriever.retrieve(corpus, queries)
         end_time = time()
@@ -222,14 +223,14 @@ class AbsTaskRetrieval(AbsTask):
         if rank != 0: return {}
         
         ndcg, _map, recall, precision = retriever.evaluate(relevant_docs, results, retriever.k_values)
-        mrr = retriever.evaluate_custom(relevant_docs, results, retriever.k_values, "mrr")
+        # mrr = retriever.evaluate_custom(relevant_docs, results, retriever.k_values, "mrr")
 
         scores = {
             **{f"ndcg_at_{k.split('@')[1]}": v for (k, v) in ndcg.items()},
-            **{f"map_at_{k.split('@')[1]}": v for (k, v) in _map.items()},
-            **{f"recall_at_{k.split('@')[1]}": v for (k, v) in recall.items()},
-            **{f"precision_at_{k.split('@')[1]}": v for (k, v) in precision.items()},
-            **{f"mrr_at_{k.split('@')[1]}": v for (k, v) in mrr.items()},
+            # **{f"map_at_{k.split('@')[1]}": v for (k, v) in _map.items()},
+            # **{f"recall_at_{k.split('@')[1]}": v for (k, v) in recall.items()},
+            # **{f"precision_at_{k.split('@')[1]}": v for (k, v) in precision.items()},
+            # **{f"mrr_at_{k.split('@')[1]}": v for (k, v) in mrr.items()},
         }
 
         return scores
