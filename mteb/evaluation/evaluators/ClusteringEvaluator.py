@@ -11,7 +11,7 @@ from .Evaluator import Evaluator
 
 
 class ClusteringEvaluator(Evaluator):
-    def __init__(self, sentences, labels, rank, clustering_batch_size=500, limit=None, **kwargs):
+    def __init__(self, rank, sentences, labels, clustering_batch_size=500, limit=None, **kwargs):
         super().__init__(**kwargs)
         if limit is not None:
             sentences = sentences[:limit]

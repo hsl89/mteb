@@ -9,13 +9,13 @@ class AbsTaskClustering(AbsTask):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def evaluate(self, model, split="test", **kwargs):
+    def evaluate(self, rank, model, split="test", **kwargs):
         if not self.data_loaded:
             self.load_data()
 
         v_measures = []
         for cluster_set in tqdm.tqdm(self.dataset[split], desc="Clustering"):
-            evaluator = ClusteringEvaluator(cluster_set["sentences"], cluster_set["labels"], **kwargs)
+            evaluator = ClusteringEvaluator(rank, cluster_set["sentences"], cluster_set["labels"], **kwargs)
             metrics = evaluator(model)
             v_measures.append(metrics["v_measure"])
 

@@ -44,8 +44,8 @@ class AbsTaskRetrieval(AbsTask):
 
     def evaluate(
         self,
-        model,
         rank, 
+        model,
         split="test",
         batch_size=128,
         corpus_chunk_size=None,

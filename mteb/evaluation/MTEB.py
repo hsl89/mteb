@@ -176,7 +176,7 @@ class MTEB:
             task.load_data()
 
     def run(
-        self, model, verbosity=1, output_folder="results/result", eval_splits=None, overwrite_results=False, **kwargs
+        self, rank, model, verbosity=1, output_folder="results/result", eval_splits=None, overwrite_results=False, **kwargs
     ):
         """
         Run the evaluation pipeline on the selected tasks.
@@ -234,7 +234,7 @@ class MTEB:
                 }
                 for split in task_eval_splits:
                     tick = time.time()
-                    results = task.evaluate(model, split, **kwargs)
+                    results = task.evaluate(rank=rank, model=model, split=split, **kwargs)
                     tock = time.time()
                     logger.info(f"Evaluation for {task.description['name']} on {split} took {tock - tick:.2f} seconds")
                     results["evaluation_time"] = round(tock - tick, 2)
