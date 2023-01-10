@@ -1,5 +1,5 @@
 import datasets
-
+from loguru import logger
 from .AbsTask import AbsTask
 
 
@@ -22,9 +22,15 @@ class CrosslingualTask(AbsTask):
             return
         self.dataset = {}
         for lang in self.langs:
-            self.dataset[lang] = datasets.load_dataset(
-                self.description["hf_hub_name"],
-                lang,
-                revision=self.description.get("revision", None),
-            )
+            try:
+                self.dataset[lang] = datasets.load_dataset(
+                    self.description["hf_hub_name"],
+                    lang,
+                    revision=self.description.get("revision", None),
+                )
+            except ValueError as e:
+                logger.warning(e)
+    
+        if self.dataset == {}:
+            raise ValueError("None of the languages %s is present in the dataset: %s" % (str(self.langs, self.description["hf_hub_name"]))) 
         self.data_loaded = True

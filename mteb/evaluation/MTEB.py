@@ -58,9 +58,9 @@ class MTEB:
         self._task_langs = task_langs if task_langs is not None else []
         if type(self._task_langs) is str:
             self._task_langs = [self._task_langs]
-        self._task_langs.extend(
-            [f"{x}-{y}" for x in self._task_langs for y in self._task_langs]
-        )  # add all possible pairs
+        # self._task_langs.extend(
+        #     [f"{x}-{y}" for x in self._task_langs for y in self._task_langs]
+        # )  # add all possible pairs
 
         self._tasks = tasks
 
